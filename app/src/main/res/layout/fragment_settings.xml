@@ -1,14 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingsFragment">
+    android:padding="16dp">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-</FrameLayout>
+        <!-- Line chart to display budget data -->
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Category selection spinner -->
+        <Spinner
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
+
+        <!-- Budget amount input field -->
+        <EditText
+            android:id="@+id/etBudgetAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter budget amount"
+            android:inputType="numberDecimal"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
+
+        <!-- Start date input field (to be populated via DatePicker) -->
+        <EditText
+            android:id="@+id/etStartDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Select start date"
+            android:focusable="false"
+            android:clickable="true"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
+
+        <!-- End date input field (to be populated via DatePicker) -->
+        <EditText
+            android:id="@+id/etEndDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Select end date"
+            android:focusable="false"
+            android:clickable="true"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
+
+        <!-- Button to add a new budget -->
+        <Button
+            android:id="@+id/btnAddBudget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Budget"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Button to save the budget -->
+        <Button
+            android:id="@+id/btnSaveBudget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save Budget"
+            android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>

@@ -6,9 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.InputType;
-import android.text.SpannableString;
-import android.text.style.ClickableSpan;
-import android.text.util.Linkify;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +15,8 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.campusexpensemanager.helper.DatabaseHelper;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

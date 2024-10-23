@@ -17,13 +17,15 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
             case 0:
                 return new HomeFragment();
             case 1:
-                return new SearchFragment();
+
+            return new MoreFragment();
             case 2:
-                return new SettingsFragment();
+
+            return new SearchFragment();
             case 3:
-                return new ProfileFragment();
+                return new SettingsFragment();
             case 4:
-                return new MoreFragment();
+                return new ProfileFragment();
             default:
                 return new HomeFragment(); // Mặc định trả về HomeFragment nếu không xác định được vị trí
         }

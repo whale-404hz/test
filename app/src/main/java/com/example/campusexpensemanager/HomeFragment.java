@@ -1,7 +1,5 @@
 package com.example.campusexpensemanager;
 
-import static android.content.Context.MODE_PRIVATE;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,80 +9,102 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.campusexpensemanager.helper.DatabaseHelper;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
+
+import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
-    private TextView balanceTextView;
-    private DatabaseHelper dbHelper;
-    private EditText edtBalance;
-    private Button btnSaveBalance;
-    private TextView userIdTextView;
-    private SharedPreferences sharedPreferences;
+    private DatabaseHelper databaseHelper;
+    private TextView totalIncomeView, totalExpenseView, balanceView;
+    private PieChart pieChart;
+    private int userId;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        // Khởi tạo các view
-        edtBalance = view.findViewById(R.id.edtBalance);
-        btnSaveBalance = view.findViewById(R.id.btnSaveBalance);
-        balanceTextView = view.findViewById(R.id.textView); // Đảm bảo rằng bạn đã khai báo đúng ID trong XML
-        userIdTextView = view.findViewById(R.id.userIdTextView);
-        // Khởi tạo DatabaseHelper với Context
-        dbHelper = new DatabaseHelper(requireContext());
+        // Khởi tạo DatabaseHelper
+        databaseHelper = new DatabaseHelper(getContext());
 
-        // Lấy user_id từ SharedPreferences
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user_session", MODE_PRIVATE);
-        int userId = sharedPreferences.getInt("user_id", -1); // Lấy user_id, giá trị mặc định là -1 nếu không có
+        // Ánh xạ các view từ XML
+        totalIncomeView = view.findViewById(R.id.textViewTotalIncome);
+        totalExpenseView = view.findViewById(R.id.textViewTotalExpense);
+        balanceView = view.findViewById(R.id.textViewBalance);
+        pieChart = view.findViewById(R.id.pieChart);
+
+
+        // Lấy ID người dùng từ phiên (SharedPreferences)
+        userId = getUserIdFromSession();
+
         if (userId != -1) {
-            // Lấy số dư từ bảng account theo user_id
-            float balance = dbHelper.getAccountBalance(userId);
 
-            // Hiển thị số dư trong TextView
-            balanceTextView.setText("Balance: " + balance + " VND");
+            // Cập nhật số liệu thống kê và biểu đồ
+            updateStatistics(userId);
         } else {
-            // Trường hợp không tìm thấy user_id
-            balanceTextView.setText("User not logged in");
+            // Không có người dùng đăng nhập
+            Toast.makeText(getContext(), "User ID not found!", Toast.LENGTH_SHORT).show();
         }
-        // Hiển thị user_id trong TextView
-        if (userId != -1) {
-            userIdTextView.setText("User ID: " + userId); // Hiển thị user_id
-            // Lấy số dư từ bảng account theo user_id
-            float balance = dbHelper.getAccountBalance(userId);
-            // Hiển thị số dư trong TextView
-            balanceTextView.setText("Balance: " + balance + " VND");
-        } else {
-            // Trường hợp không tìm thấy user_id
-            userIdTextView.setText("User not logged in");
-            balanceTextView.setText("User not logged in");
-        }
-        // Thiết lập hành động khi nhấn nút "Save Balance"
-        btnSaveBalance.setOnClickListener(v -> {
-            // Lấy giá trị từ EditText
-            String balanceStr = edtBalance.getText().toString();
-
-            if (!balanceStr.isEmpty()) {
-                // Chuyển giá trị về dạng số
-                float balance = Float.parseFloat(balanceStr);
-
-                // Cập nhật balance vào cơ sở dữ liệu
-                boolean isUpdated = dbHelper.updateAccountBalance(userId, balance);
-
-                if (isUpdated) {
-                    Toast.makeText(requireActivity(), "Account Balance updated successfully!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(requireActivity(), "Failed to update Account Balance.", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(requireActivity(), "Please enter a balance", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Cập nhật số liệu thống kê và biểu đồ khi người dùng quay lại trang
+        if (userId != -1) {
+            updateStatistics(userId);
+        }
+    }
+
+    // Cập nhật tổng thu nhập, chi tiêu và số dư
+    private void updateStatistics(int userId) {
+        // Lấy tổng thu nhập và chi tiêu từ cơ sở dữ liệu
+        double totalIncome = databaseHelper.getTotalIncome(userId);
+        double totalExpense = databaseHelper.getTotalExpense(userId);
+        double balance = totalIncome - totalExpense;
+
+        // Hiển thị dữ liệu đã được format cho người dùng
+        totalIncomeView.setText(String.format("Total Income: %.2f", totalIncome));
+        totalExpenseView.setText(String.format("Total Expense: %.2f", totalExpense));
+        balanceView.setText(String.format("Balance: %.2f", balance));
+
+        // Cập nhật biểu đồ nếu có dữ liệu hợp lệ
+        if (totalIncome > 0 || totalExpense > 0) {
+            updatePieChart(totalIncome, totalExpense);
+        } else {
+            pieChart.clear();  // Xóa biểu đồ nếu không có dữ liệu
+        }
+    }
+
+    // Cập nhật biểu đồ tròn cho thu nhập và chi tiêu
+    private void updatePieChart(double income, double expense) {
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        entries.add(new PieEntry((float) income, "Income"));
+        entries.add(new PieEntry((float) expense, "Expense"));
+
+        PieDataSet dataSet = new PieDataSet(entries, "Financial Overview");
+        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);  // Sử dụng màu mặc định của thư viện
+
+        PieData data = new PieData(dataSet);
+        pieChart.setData(data);
+        pieChart.invalidate();  // Làm mới biểu đồ
+    }
+
+    // Lấy user_id từ phiên hiện tại (SharedPreferences)
+    private int getUserIdFromSession() {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("user_session", Context.MODE_PRIVATE);
+        return sharedPreferences.getInt("user_id", -1);  // Trả về -1 nếu không tìm thấy user_id
     }
 }

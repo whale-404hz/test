@@ -8,34 +8,41 @@
     tools:context=".MainActivity"
     >
     <!-- ViewPager2 sẽ nằm trên cùng -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/tabLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- TabLayout sẽ nằm ở chân ứng dụng -->
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
-        android:layout_width="411dp"
-        android:layout_height="53dp"
-        android:background="?attr/colorPrimary"
+<!--    <androidx.viewpager2.widget.ViewPager2-->
+<!--        android:id="@+id/viewPager"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="110dp"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/bottom_nav"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.0"-->
+<!--        app:layout_constraintStart_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView"
+        android:name="com.example.campusexpensemanager.HomeFragment"
+        android:layout_width="412dp"
+        android:layout_height="772dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragmentContainerView"
         app:layout_constraintVertical_bias="1.0"
-        app:tabIndicatorColor="@color/white"
-        app:tabPaddingBottom="16dp"
-        app:tabPaddingEnd="32dp"
-        app:tabPaddingStart="32dp"
-        app:tabPaddingTop="16dp"
-        app:tabSelectedTextColor="@color/white"
-        app:tabTextColor="@color/white" />
+        app:menu="@menu/buttom_nav_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
